@@ -16,6 +16,54 @@ export type LiveServResult = {
 };
 
 /**
+ * Body of the chat completion. SERV strips every `serv_*` tool before the
+ * upstream model sees the request, and it forwards `tool_choice` unchanged.
+ * Setting `tool_choice` here makes the upstream call fail with
+ * "tool_choice is only allowed when tools are specified", because no tools
+ * remain. The official SERV tool examples omit `tool_choice`. Structured
+ * output stays on `response_format`.
+ */
+export function servCompletionBody(packet: ServPacket) {
+  return {
+    model: SERV_MODEL,
+    reasoning_effort: "low" as const,
+    max_completion_tokens: 1400,
+    messages: [
+      { role: "system" as const, content: SYSTEM_PROMPT },
+      {
+        role: "user" as const,
+        content: `Review this settlement. Reply with the JSON object only.\n\n${JSON.stringify(packet)}`,
+      },
+    ],
+    response_format: {
+      type: "json_schema" as const,
+      json_schema: {
+        name: "settlement_verdict",
+        strict: true,
+        schema: VERDICT_SCHEMA,
+      },
+    },
+    tools: [
+      { type: "function" as const, function: { name: "serv_prompt_guard" } },
+      {
+        type: "function" as const,
+        function: {
+          name: "serv_shadow_agent",
+          description: "Validate the settlement verdict before it is returned.",
+          parameters: {
+            type: "object",
+            properties: {
+              hint: { type: "string", default: SHADOW_HINT },
+              max_iterations: { type: "integer", default: 2 },
+            },
+          },
+        },
+      },
+    ],
+  };
+}
+
+/**
  * Server-side SERV Reasoning call. The route handler reads SERV_API_KEY and passes it in.
  * Every request includes a system prompt, a JSON schema, the prompt guard, and the shadow agent.
  */
@@ -24,47 +72,9 @@ export async function requestServOpinion(packet: ServPacket, apiKey: string): Pr
     baseURL: SERV_BASE_URL,
     apiKey,
   });
-  const completion = await client.chat.completions.create(
-    {
-      model: SERV_MODEL,
-      reasoning_effort: "low",
-      max_completion_tokens: 1400,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Review this settlement. Reply with the JSON object only.\n\n${JSON.stringify(packet)}`,
-        },
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "settlement_verdict",
-          strict: true,
-          schema: VERDICT_SCHEMA,
-        },
-      },
-      tools: [
-        { type: "function", function: { name: "serv_prompt_guard" } },
-        {
-          type: "function",
-          function: {
-            name: "serv_shadow_agent",
-            description: "Validate the settlement verdict before it is returned.",
-            parameters: {
-              type: "object",
-              properties: {
-                hint: { type: "string", default: SHADOW_HINT },
-                max_iterations: { type: "integer", default: 2 },
-              },
-            },
-          },
-        },
-      ],
-      tool_choice: "none",
-    },
-    { signal: AbortSignal.timeout(28_000) },
-  );
+  const completion = await client.chat.completions.create(servCompletionBody(packet), {
+    signal: AbortSignal.timeout(28_000),
+  });
   const content = completion.choices[0]?.message?.content;
   if (!content) throw new Error("SERV returned an empty verdict.");
   return {

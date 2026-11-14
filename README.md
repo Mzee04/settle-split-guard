@@ -51,9 +51,10 @@ const completion = await client.chat.completions.create({
     { type: "function", function: { name: "serv_prompt_guard" } },
     { type: "function", function: { name: "serv_shadow_agent", parameters: shadowParameters } },
   ],
-  tool_choice: "none",
 });
 ```
+
+`tool_choice` is omitted. SERV removes `serv_*` tools before the upstream model sees the request and forwards `tool_choice` as-is, so a leftover `tool_choice` is rejected with “tool_choice is only allowed when tools are specified.” The JSON schema on `response_format` is what forces the verdict.
 
 The full call is in `src/serv/client.ts`. The system prompt is in `src/serv/prompt.ts`. The route is `src/app/api/review/route.ts`.
 
