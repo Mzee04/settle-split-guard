@@ -25,8 +25,8 @@ You load a sample group or paste a Settlemany group (JSON, or the `settlemany.v1
 Press **Review before settling**. On the server:
 
 1. A deterministic policy recomputes every share in integer cents, checks that the payments clear the group, and checks each cashaddr for checksum, network (chipnet vs mainnet), and whether it is new or a lookalike of an address this group already saved.
-2. SERV Reasoning (`gpt-5.4-mini` on `https://inference-api.openserv.ai/v1`) reads the ledger, the local findings, and the notes, and returns a schema-locked verdict with fairness flags, dispute quotes, and a reason trail. The request always has a system prompt. Prompt guard and the shadow agent are on, because the chat is untrusted and a sloppy SETTLE is expensive.
-3. The combiner keeps the more cautious verdict. If SERV says SETTLE and a hard rule failed, the final verdict is REJECT and the UI shows the disagreement.
+2. SERV Reasoning (`gpt-5.4-mini` on `https://inference-api.openserv.ai/v1`) reads the ledger, the local findings, and the notes, and returns a schema-locked verdict with fairness flags, dispute quotes, and a reason trail. The request always has a system prompt. Prompt guard and the shadow agent are on, because the chat is untrusted and a sloppy SETTLE is expensive. Network, address validity, and math are treated as facts from the local findings. An empty or non-JSON answer is retried twice.
+3. The combiner keeps the more cautious verdict. If SERV says SETTLE and a hard rule failed, the final verdict is REJECT and the UI shows the disagreement. If SERV invents a wrong network, a bad address, or broken math that the policy does not support, that claim is marked unsupported and does not raise the verdict. A timeout, a rejected key, rate limiting, or a server error is a short message with a demo-mode fallback. The provider body is not shown.
 
 SETTLE unlocks a link to Settlemany. WAIT unlocks it only after a named person writes why they are continuing. That override is part of the audit. REJECT does not unlock. Each person still confirms and signs their own share in Settlemany.
 

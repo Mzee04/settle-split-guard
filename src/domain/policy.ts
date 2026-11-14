@@ -11,8 +11,6 @@ export function runPolicy(input: ReviewInput): PolicyReport {
     creditorIds = rawBalances(input.group)
       .filter((balance) => balance.cents > 0)
       .map((balance) => balance.memberId);
-  } else {
-    creditorIds = input.receivers.map((receiver) => receiver.memberId);
   }
   const destination = checkDestinations(input.group, input.network, input.receivers, creditorIds);
   const findings = [...math, ...destination];

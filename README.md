@@ -21,7 +21,9 @@ The deterministic policy runs beside SERV. The final verdict is the **more cauti
 - If SERV says SETTLE and a hard rule fails (math, invalid cashaddr, wrong network), the final verdict is **REJECT**. The screen shows the disagreement.
 - If SERV says SETTLE and the policy only has a warning (a new or lookalike address), the final verdict is **WAIT**, and the disagreement is shown.
 - SERV can still WAIT or REJECT on fairness or the chat when the policy is clean. The model cannot loosen a harder policy verdict.
-- If SERV asserts a wrong network, an invalid address, or broken math and the policy has no matching hard failure, the audit marks that claim **unsupported by policy**. The claim does not raise the verdict. Fairness and open disputes can still hold the result at WAIT. The disagreement stays visible. Empty or non-JSON SERV bodies are retried twice before the review errors.
+- If SERV asserts a wrong network, an invalid address, or broken math and the policy has no matching hard failure, the audit marks that claim **unsupported by policy**. The claim does not raise the verdict. Fairness and open disputes can still hold the result at WAIT. The disagreement stays visible.
+- Empty or non-JSON SERV bodies are retried twice. A timeout, a rejected key (401), rate limiting (429), or a 5xx response is shown as a short message, and the page offers **Review again in demo mode**. The provider’s raw body is not shown.
+- Each expense line is capped at $10,000,000 so the cents stay exact. An empty group, a single person, or a group with no expenses is **REJECT**.
 
 A person can record an override only on **WAIT**. That name and reason are written into the audit, and only then does “Proceed to Settlemany” unlock. **REJECT** stays closed. **SETTLE** unlocks without an override. The handoff opens [Settlemany](https://mzee04.github.io/settlemany/). Settlemany keeps its ledger in that browser, so the guard also downloads the group JSON. This app never signs and never broadcasts.
 
@@ -126,7 +128,7 @@ npm run build
 npm start
 ```
 
-`npm start` binds `0.0.0.0` and uses `PORT` (3847 if unset).
+`npm start` runs `scripts/start.cjs`. It binds `0.0.0.0` and uses `PORT` when that variable is a number, otherwise 3847. Node 22 or newer is required (`engines` and `NODE_VERSION` in `render.yaml`).
 
 ## Demo mode
 
@@ -145,14 +147,14 @@ This repo includes `render.yaml` for a free Render web service. It is not deploy
 1. Push the repo to a host Render can see.
 2. In the Render dashboard, create a Blueprint from `render.yaml` (or a web service with build `npm ci && npm test && npm run build` and start `npm start`).
 3. Set `SERV_API_KEY` in the environment. Leave it unset to run demo-only.
-4. The service binds `0.0.0.0:$PORT`. `/api/health` is the health check.
+4. Render sets `PORT`. `npm start` reads it in Node and binds `0.0.0.0`. `NODE_VERSION` is 22. `/api/health` is the health check.
 5. Free web services spin down after a period of inactivity. The filesystem is ephemeral. Audits stay in the browser that requested them. Nothing here needs a database.
 
 The same Next.js app runs on a Vercel-style host: import the project, set `SERV_API_KEY` in the project environment, and leave the API route as a serverless function. Do not mark the key as exposed to the browser.
 
 ## Tests
 
-`npm test` covers cent splits and remainder assignment, zero-sum balances, the one-cent leak, an amounts split that does not add up, cashaddr checksums, lookalike and wrong-network addresses, the verdict combiner including the SETTLE-overruled-by-REJECT case, human override, recorded demo reviews, replay diffs, Settlemany JSON import, SERV JSON parsing, and a scan that keeps the API key out of client code.
+`npm test` covers cent splits and remainder assignment, zero-sum balances, the one-cent leak, an amounts split that does not add up, the $10,000,000 cap, empty and one-person ledgers, cashaddr checksums, lookalike and wrong-network addresses, the verdict combiner including the SETTLE-overruled-by-REJECT case and unsupported network claims, human override, recorded demo reviews, replay diffs, Settlemany JSON import, invalid JSON, SERV JSON parsing, friendly messages for timeout, 401, 429, and 5xx, and a scan that keeps the API key out of client code.
 
 ## Revenue model
 

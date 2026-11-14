@@ -1,3 +1,6 @@
+import { runPolicy } from "@/domain/policy";
+import { explainServFailure } from "@/serv/errors";
+import { buildServPacket } from "@/serv/packet";
 import { buildAudit, reviewDemo } from "@/serv/review";
 import { requestServOpinion } from "@/serv/client";
 import { parseReviewRequest } from "@/serv/parseRequest";
@@ -23,8 +26,6 @@ export async function POST(request: Request) {
 
   const requestedAt = new Date().toISOString();
   try {
-    const { buildServPacket } = await import("@/serv/packet");
-    const { runPolicy } = await import("@/domain/policy");
     const policy = runPolicy(parsed.input);
     const { packet } = buildServPacket(parsed.input, policy.findings);
     const result = await requestServOpinion(packet, key);
@@ -42,10 +43,7 @@ export async function POST(request: Request) {
     });
     return Response.json({ audit });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "SERV request failed.";
-    return Response.json(
-      { error: `SERV Reasoning did not return a verdict. ${message} You can run the review again in demo mode.` },
-      { status: 502 },
-    );
+    const explained = explainServFailure(error);
+    return Response.json({ error: explained.message }, { status: explained.status });
   }
 }

@@ -2,10 +2,13 @@
   "name": "settle-split-guard",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 3847",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p ${PORT:-3847}",
+    "start": "node scripts/start.cjs",
     "lint": "eslint",
     "test": "vitest run"
   },

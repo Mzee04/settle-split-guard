@@ -1,6 +1,6 @@
 import { applyTransfers, netBalances, type Transfer } from "./netting";
 import { expenseShares, memberName, rawBalances, type Group } from "./ledger";
-import { formatUsd } from "./money";
+import { formatUsd, MAX_SETTLE_CENTS } from "./money";
 import type { Finding } from "./types";
 
 export function checkMath(group: Group, proposedTransfers?: Transfer[]): Finding[] {
@@ -37,6 +37,22 @@ export function checkMath(group: Group, proposedTransfers?: Transfer[]): Finding
           `math-expense-${expense.id}-integer`,
           `${expense.memo || "An expense"} is not in whole cents`,
           "Settlemany stores money as integer cents. A fractional cent would leak or be invented at settlement.",
+        ),
+      );
+      continue;
+    }
+    if (
+      !Number.isSafeInteger(expense.usdCents) ||
+      !Number.isSafeInteger(expense.amountCents) ||
+      expense.usdCents > MAX_SETTLE_CENTS ||
+      expense.amountCents > MAX_SETTLE_CENTS
+    ) {
+      splitFailed = true;
+      findings.push(
+        fail(
+          `math-expense-${expense.id}-size`,
+          `${expense.memo || "An expense"} is too large to settle exactly`,
+          `Each line has to be at most ${formatUsd(MAX_SETTLE_CENTS)}. Bigger numbers stop being exact cents.`,
         ),
       );
       continue;

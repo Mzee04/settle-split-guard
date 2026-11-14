@@ -1,6 +1,7 @@
 # Render Blueprint for a free web service with a server-side API route.
 # Create the service from this file, then set SERV_API_KEY in the dashboard.
 # Do not put a real key in this file.
+# npm start runs scripts/start.cjs, which binds 0.0.0.0 and uses Render's PORT.
 services:
   - type: web
     name: settle-split-guard

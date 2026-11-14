@@ -1,4 +1,6 @@
 /** Integer cents. The ledger never stores a float. */
+/** $10,000,000. Larger figures stop being exact integers in JavaScript. */
+export const MAX_SETTLE_CENTS = 1_000_000_000;
 
 export function assertInt(value: number, label: string): void {
   if (!Number.isInteger(value)) {
@@ -20,6 +22,22 @@ export function parseUsdToCents(value: string): number | null {
   const negative = trimmed.startsWith("-");
   const [whole, frac = ""] = trimmed.replace("-", "").split(".");
   const cents = Number(whole) * 100 + Number(frac.padEnd(2, "0"));
-  if (!Number.isSafeInteger(cents)) return null;
+  if (!Number.isSafeInteger(cents) || Math.abs(cents) > MAX_SETTLE_CENTS) return null;
   return negative ? -cents : cents;
+}
+
+/** What to tell a person who is still typing an expense amount. Incomplete input is not an error. */
+export function amountInputError(value: string): string | null {
+  const trimmed = value.trim();
+  if (trimmed === "" || /^\d+\.$/.test(trimmed)) return null;
+  const cents = parseUsdToCents(trimmed);
+  if (cents === null) {
+    const numeric = trimmed.replace(/[$,]/g, "");
+    if (/^\d+(\.\d{1,2})?$/.test(numeric)) {
+      return `Use at most ${formatUsd(MAX_SETTLE_CENTS)}. Larger amounts are not exact in cents.`;
+    }
+    return "Use dollars and cents, such as 32.50.";
+  }
+  if (cents < 0) return "An expense cannot be negative.";
+  return null;
 }

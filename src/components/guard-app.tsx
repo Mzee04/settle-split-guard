@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { importSettlemany } from "@/domain/importGroup";
 import { rawBalances, type Group } from "@/domain/ledger";
-import { formatUsd, parseUsdToCents } from "@/domain/money";
+import { amountInputError, formatUsd, parseUsdToCents } from "@/domain/money";
 import { openTransfers } from "@/domain/ledger";
 import { runPolicy } from "@/domain/policy";
 import { CLEAN_REVIEW, LEAK_REVIEW, LISBON_REVIEW, receiversFromMembers } from "@/domain/sample";
@@ -290,13 +290,14 @@ export function GuardApp() {
                     <Input
                       inputMode="decimal"
                       aria-label={`${expense.memo} amount in dollars`}
+                      aria-invalid={amountDrafts[expense.id] !== undefined && amountInputError(amountDrafts[expense.id]!) !== null}
                       className="h-11 bg-white"
                       value={amountDrafts[expense.id] ?? (expense.usdCents / 100).toFixed(2)}
                       onChange={(event) => {
                         const text = event.target.value;
                         setAmountDrafts((current) => ({ ...current, [expense.id]: text }));
                         const cents = parseUsdToCents(text);
-                        if (cents === null || cents < 0) return;
+                        if (cents === null || cents < 0 || amountInputError(text)) return;
                         patch({
                           ...draft,
                           group: {
@@ -308,6 +309,9 @@ export function GuardApp() {
                         });
                       }}
                     />
+                    {amountDrafts[expense.id] !== undefined && amountInputError(amountDrafts[expense.id]!) ? (
+                      <span className="text-[#8d2610]">{amountInputError(amountDrafts[expense.id]!)}</span>
+                    ) : null}
                   </label>
                 ))}
                 <div className="flex flex-wrap gap-2">
@@ -476,7 +480,7 @@ export function GuardApp() {
                     void review(draft, true);
                   }}
                 >
-                  Run the recorded demo instead
+                  Review again in demo mode
                 </Button>
               </div>
             ) : null}
