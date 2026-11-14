@@ -1,7 +1,8 @@
+import { hasNonHardConcern, unsupportedHardClaims } from "../domain/claims";
 import { inputsHash } from "../domain/hash";
 import { normalizeInput } from "../domain/normalize";
 import { runPolicy } from "../domain/policy";
-import type { AuditRecord, ReviewInput, ServCallMeta, ServOpinion } from "../domain/types";
+import type { AuditRecord, Finding, ReviewInput, ServCallMeta, ServOpinion } from "../domain/types";
 import { combineVerdicts } from "../domain/verdict";
 import { selectDemo } from "./demo";
 import { opinionFindings } from "./opinion";
@@ -32,8 +33,21 @@ export function buildAudit(input: ReviewInput, opinion: ServOpinion, meta: ServC
   const normalized = normalizeInput(input);
   const policy = runPolicy(normalized);
   const { packet, legend } = buildServPacket(normalized, policy.findings);
-  const combined = combineVerdicts(policy.verdict, policy.summary, opinion.verdict, opinion.confidencePercent, opinion.summary);
+  const unsupported = unsupportedHardClaims(opinion, policy, normalized.network);
+  const combined = combineVerdicts(policy.verdict, policy.summary, opinion.verdict, opinion.confidencePercent, opinion.summary, {
+    unsupportedClaims: unsupported,
+    servHasNonHardConcern: hasNonHardConcern(opinion, normalized.network),
+    policyHasHardFailure: policy.hardFailures.length > 0,
+  });
   const stamp = now.getTime().toString(36);
+  const unsupportedFindings: Finding[] = unsupported.map((claim, index) => ({
+    id: `unsupported-${claim.fact}-${index}`,
+    check: "policy",
+    severity: "info",
+    hard: false,
+    title: `Unsupported by policy: ${claim.fact}`,
+    detail: claim.because,
+  }));
   return {
     version: 1,
     id: `rev_${inputsHash(normalized).slice(0, 12)}_${stamp}`,
@@ -42,7 +56,7 @@ export function buildAudit(input: ReviewInput, opinion: ServOpinion, meta: ServC
     input: normalized,
     packet,
     legend,
-    checks: [...policy.findings, ...opinionFindings(opinion)],
+    checks: [...policy.findings, ...unsupportedFindings, ...opinionFindings(opinion)],
     policy,
     serv: { ...meta, opinion },
     disagreement: combined.disagreement,
@@ -52,6 +66,7 @@ export function buildAudit(input: ReviewInput, opinion: ServOpinion, meta: ServC
     confidencePercent: combined.confidencePercent,
     reasonTrail: [
       ...opinion.reasonTrail,
+      ...unsupported.map((claim) => ({ step: "Unsupported by policy", because: claim.because })),
       {
         step: "Second opinion",
         because:

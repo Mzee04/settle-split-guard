@@ -21,6 +21,7 @@ The deterministic policy runs beside SERV. The final verdict is the **more cauti
 - If SERV says SETTLE and a hard rule fails (math, invalid cashaddr, wrong network), the final verdict is **REJECT**. The screen shows the disagreement.
 - If SERV says SETTLE and the policy only has a warning (a new or lookalike address), the final verdict is **WAIT**, and the disagreement is shown.
 - SERV can still WAIT or REJECT on fairness or the chat when the policy is clean. The model cannot loosen a harder policy verdict.
+- If SERV asserts a wrong network, an invalid address, or broken math and the policy has no matching hard failure, the audit marks that claim **unsupported by policy**. The claim does not raise the verdict. Fairness and open disputes can still hold the result at WAIT. The disagreement stays visible. Empty or non-JSON SERV bodies are retried twice before the review errors.
 
 A person can record an override only on **WAIT**. That name and reason are written into the audit, and only then does “Proceed to Settlemany” unlock. **REJECT** stays closed. **SETTLE** unlocks without an override. The handoff opens [Settlemany](https://mzee04.github.io/settlemany/). Settlemany keeps its ledger in that browser, so the guard also downloads the group JSON. This app never signs and never broadcasts.
 

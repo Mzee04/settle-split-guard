@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { ServPacket } from "../domain/types";
+import { SERV_RETRY_DELAYS_MS, servCompletionBody, withServContentRetries } from "./client";
 import { SHADOW_HINT, SYSTEM_PROMPT } from "./prompt";
 import { VERDICT_SCHEMA } from "./schema";
-import { servCompletionBody } from "./client";
 
 const packet: ServPacket = {
   network: "chipnet",
@@ -46,5 +46,58 @@ describe("SERV request shape", () => {
       },
     });
     expect(SHADOW_HINT.length).toBeGreaterThan(0);
+    expect(body).not.toHaveProperty("temperature");
+  });
+});
+
+describe("SERV content retries", () => {
+  it("retries an empty body and a non-JSON body, then accepts JSON", async () => {
+    const sleeps: number[] = [];
+    const seen = ["", "not json", '{"ok":true}'];
+    let calls = 0;
+    const value = await withServContentRetries(
+      async () => {
+        const content = seen[calls] ?? "";
+        calls += 1;
+        if (!content.trim()) throw new Error("SERV returned an empty verdict.");
+        try {
+          return JSON.parse(content) as { ok: boolean };
+        } catch {
+          throw new Error("SERV did not return JSON.");
+        }
+      },
+      { sleep: async (ms) => { sleeps.push(ms); }, delays: SERV_RETRY_DELAYS_MS },
+    );
+    expect(value).toEqual({ ok: true });
+    expect(calls).toBe(3);
+    expect(sleeps).toEqual([500, 1500]);
+  });
+
+  it("stops after two retries when every body is empty", async () => {
+    let calls = 0;
+    await expect(
+      withServContentRetries(
+        async () => {
+          calls += 1;
+          throw new Error("SERV returned an empty verdict.");
+        },
+        { sleep: async () => {}, maxAttempts: 3 },
+      ),
+    ).rejects.toThrow(/empty verdict/);
+    expect(calls).toBe(3);
+  });
+
+  it("does not retry an upstream rejection", async () => {
+    let calls = 0;
+    await expect(
+      withServContentRetries(
+        async () => {
+          calls += 1;
+          throw new Error("400 Invalid value for 'tool_choice'");
+        },
+        { sleep: async () => { throw new Error("should not sleep"); } },
+      ),
+    ).rejects.toThrow(/tool_choice/);
+    expect(calls).toBe(1);
   });
 });
