@@ -2,6 +2,10 @@
 
 Settle Split Guard reviews a group settlement **before anyone signs**. It is an Open Track entry for [SERV Hackathon Edition 02](https://www.openserv.ai/hackathon-2).
 
+Public code: [github.com/Mzee04/settle-split-guard](https://github.com/Mzee04/settle-split-guard).
+
+Expected live demo, once the Render blueprint is applied: [settle-split-guard.onrender.com](https://settle-split-guard.onrender.com). That service is on Render’s free tier, so the first load after a sleep can take about 30 seconds while the instance wakes. Until that deploy exists, run it locally with the steps below. Demo mode does not need a key.
+
 [Settlemany](https://github.com/Mzee04/settlemany) already nets a group’s shared expenses and closes them in **one Bitcoin Cash transaction**, with each payer signing only their own input. That ledger is a live BCH BLAZE entry, and this project does not modify it. The guard sits in front of it. SERV Reasoning recommends **SETTLE**, **WAIT**, or **REJECT**. A deterministic policy checks the same proposal and can overrule the model. People keep the authority to sign.
 
 “The model decided” is not a settlement. The audit record stores the inputs hash, every check, both evaluators, and the final verdict, so a review can be replayed.
@@ -142,9 +146,9 @@ Edit a note or an address and review again. If the inputs hash changes, the trai
 
 ## Deploy
 
-This repo includes `render.yaml` for a free Render web service. It is not deployed from here.
+This repo includes `render.yaml` for a free Render web service. `SERV_API_KEY` is declared with `sync: false`, so the Blueprint never writes a key into the file. Set the key in the Render dashboard. The expected public URL is [https://settle-split-guard.onrender.com](https://settle-split-guard.onrender.com). On the free tier the process sleeps when idle, and the first request after that can take about 30 seconds.
 
-1. Push the repo to a host Render can see.
+1. Connect [github.com/Mzee04/settle-split-guard](https://github.com/Mzee04/settle-split-guard) in the Render dashboard.
 2. In the Render dashboard, create a Blueprint from `render.yaml` (or a web service with build `npm ci && npm test && npm run build` and start `npm start`).
 3. Set `SERV_API_KEY` in the environment. Leave it unset to run demo-only.
 4. Render sets `PORT`. `npm start` reads it in Node and binds `0.0.0.0`. `NODE_VERSION` is 22. `/api/health` is the health check.

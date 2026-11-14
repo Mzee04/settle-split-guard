@@ -44,6 +44,10 @@ Settlemany (https://github.com/Mzee04/settlemany, live at https://mzee04.github.
 
 Settle Split Guard is new work for this hackathon. The review gate, the SERV call, the deterministic second opinion, the disagreement rule, the audit and replay, the privacy toggles, and the handoff are all new. The cent split and netting were ported so the guard uses the same numbers Settlemany will settle. They were not copied by changing the other repository.
 
+Public repository: https://github.com/Mzee04/settle-split-guard
+
+Expected demo URL: https://settle-split-guard.onrender.com — a Render free-tier web service. The first load after the instance sleeps can take about 30 seconds. Demo mode works on that URL without a key; a live SERV verdict needs `SERV_API_KEY` set in Render (`sync: false` in `render.yaml`).
+
 ## Two-minute demo script
 
 0:00 — Open the app. Say: this does not sign. It reviews a Settlemany group before the signatures.
@@ -64,7 +68,7 @@ Settle Split Guard is new work for this hackathon. The review gate, the SERV cal
 
 ## Draft X post
 
-Do not post this from the agent. Post it from the project owner’s account, with the repo and demo links filled in.
+Do not post this from the agent. Post it from the project owner’s account.
 
 ```text
 Settle Split Guard is my Open Track entry for SERV Hackathon Edition 02.
@@ -73,7 +77,10 @@ Before a group settles shared expenses in one Bitcoin Cash transaction, SERV Rea
 
 Built in front of Settlemany. Demo mode works before you add a key.
 
+https://github.com/Mzee04/settle-split-guard
+https://settle-split-guard.onrender.com
+
 @openservai
 ```
 
-Add the public repo URL and the demo URL before posting. The submission form asks for the link to that post.
+The demo link is the expected Render free-tier URL. The first open after the service sleeps can take about 30 seconds. The submission form asks for the link to the post.
