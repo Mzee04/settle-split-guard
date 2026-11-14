@@ -12,7 +12,7 @@ import { rawBalances, type Group } from "@/domain/ledger";
 import { formatUsd, parseUsdToCents } from "@/domain/money";
 import { openTransfers } from "@/domain/ledger";
 import { runPolicy } from "@/domain/policy";
-import { CLEAN_REVIEW, LAGOS_REVIEW, LEAK_REVIEW, receiversFromMembers } from "@/domain/sample";
+import { CLEAN_REVIEW, LEAK_REVIEW, LISBON_REVIEW, receiversFromMembers } from "@/domain/sample";
 import type { AuditRecord, NetworkId, ReviewInput } from "@/domain/types";
 import { buildServPacket } from "@/serv/packet";
 import { ReviewResult } from "./review-result";
@@ -148,8 +148,8 @@ export function GuardApp() {
         </section>
 
         <section className="flex flex-wrap gap-2">
-          <Button type="button" className="h-11 rounded-full px-4" onClick={() => { setImported(null); load(LAGOS_REVIEW); }}>
-            Load Lagos weekend
+          <Button type="button" className="h-11 rounded-full px-4" onClick={() => { setImported(null); load(LISBON_REVIEW); }}>
+            Load Lisbon weekend
           </Button>
           <Button type="button" variant="outline" className="h-11 rounded-full bg-white px-4" onClick={() => { setImported(null); load(CLEAN_REVIEW); }}>
             Load a clean flat
@@ -216,7 +216,7 @@ export function GuardApp() {
             <CardHeader>
               <CardTitle className="display text-2xl">No group loaded</CardTitle>
               <p className="leading-relaxed">
-                Start with the Lagos weekend. It has four people, a hotel, a taxi, and dinner. Ife is still ticked on a room she says she did not use, and Amaka’s payout address is a lookalike of the one saved on her profile.
+                Start with the Lisbon weekend. It has four people, a hotel, a taxi, and dinner. Daniel is still ticked on a room he says he did not use, and Maya’s payout address is a lookalike of the one saved on her profile.
               </p>
             </CardHeader>
           </Card>
@@ -420,7 +420,7 @@ export function GuardApp() {
                     checked={draft.pseudonymize}
                     onCheckedChange={(checked) => patch({ ...draft, pseudonymize: checked })}
                   />
-                  <span>Pseudonymize names before sending. “Amaka Osei” becomes Member 1 in the SERV payload. The screen still shows real names.</span>
+                  <span>Pseudonymize names before sending. “Daniel Berg” becomes Member 1 in the SERV payload. The screen still shows real names.</span>
                 </label>
                 <label className="flex items-start gap-3 text-sm">
                   <Checkbox

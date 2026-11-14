@@ -9,7 +9,7 @@ import { checkMath } from "./mathCheck";
 import { applyTransfers } from "./netting";
 import { runPolicy } from "./policy";
 import { diffAudits } from "./replay";
-import { ADDRESSES, CLEAN_REVIEW, LAGOS_REVIEW, LEAK_REVIEW } from "./sample";
+import { ADDRESSES, CLEAN_REVIEW, LEAK_REVIEW, LISBON_REVIEW } from "./sample";
 import { allocateCents } from "./split";
 import { applyHumanOverride, combineVerdicts, handoffAllowed } from "./verdict";
 import { buildServPacket } from "../serv/packet";
@@ -29,13 +29,13 @@ describe("cashaddr", () => {
   });
 
   it("rejects mixed case, a flipped character, and a chipnet address on the wrong check", () => {
-    const address = ADDRESSES.amaka;
+    const address = ADDRESSES.maya;
     expect(isCashaddrError(decodeCashaddr(address.slice(0, 12).toUpperCase() + address.slice(12)))).toBe(true);
     const flipped = `${address.slice(0, -1)}${address.endsWith("w") ? "x" : "w"}`;
     const broken = decodeCashaddr(flipped);
     expect(isCashaddrError(broken)).toBe(true);
-    const chipnet = decodeCashaddr(ADDRESSES.amaka);
-    const mainnet = decodeCashaddr(ADDRESSES.amakaMainnet);
+    const chipnet = decodeCashaddr(ADDRESSES.maya);
+    const mainnet = decodeCashaddr(ADDRESSES.mayaMainnet);
     expect(isCashaddrError(chipnet)).toBe(false);
     expect(isCashaddrError(mainnet)).toBe(false);
     if (!isCashaddrError(chipnet) && !isCashaddrError(mainnet)) {
@@ -48,24 +48,24 @@ describe("cashaddr", () => {
 describe("math integrity", () => {
   it("splits a remainder without leaking a cent", () => {
     const shares = allocateCents(3250, [
-      { memberId: "amaka", weight: 1 },
-      { memberId: "tunde", weight: 1 },
-      { memberId: "seyi", weight: 1 },
-      { memberId: "ife", weight: 1 },
+      { memberId: "daniel", weight: 1 },
+      { memberId: "kenji", weight: 1 },
+      { memberId: "maya", weight: 1 },
+      { memberId: "sofia", weight: 1 },
     ]);
     expect(shares.reduce((sum, share) => sum + share.cents, 0)).toBe(3250);
-    expect(shares.find((share) => share.memberId === "amaka")?.cents).toBe(813);
-    expect(shares.find((share) => share.memberId === "tunde")?.cents).toBe(812);
+    expect(shares.find((share) => share.memberId === "daniel")?.cents).toBe(813);
+    expect(shares.find((share) => share.memberId === "sofia")?.cents).toBe(812);
   });
 
-  it("clears the Lagos weekend and keeps Ife on a $60 hotel share", () => {
-    const balances = rawBalances(LAGOS_REVIEW.group);
+  it("clears the Lisbon weekend and keeps Daniel on a $60 hotel share", () => {
+    const balances = rawBalances(LISBON_REVIEW.group);
     expect(balances.reduce((sum, balance) => sum + balance.cents, 0)).toBe(0);
-    const hotel = LAGOS_REVIEW.group.expenses.find((expense) => expense.id === "hotel");
+    const hotel = LISBON_REVIEW.group.expenses.find((expense) => expense.id === "hotel");
     expect(hotel).toBeTruthy();
     const shares = expenseShares(hotel!);
-    expect(shares.find((share) => share.memberId === "ife")?.cents).toBe(6000);
-    const findings = checkMath(LAGOS_REVIEW.group);
+    expect(shares.find((share) => share.memberId === "daniel")?.cents).toBe(6000);
+    const findings = checkMath(LISBON_REVIEW.group);
     expect(findings.some((finding) => finding.id === "math-ok")).toBe(true);
     expect(findings.some((finding) => finding.hard && finding.severity === "fail")).toBe(false);
   });
@@ -87,9 +87,9 @@ describe("math integrity", () => {
       ...group.expenses[0]!,
       splitMode: "amounts",
       parts: [
-        { memberId: "ada", amountCents: 30000 },
-        { memberId: "bola", amountCents: 30000 },
-        { memberId: "chi", amountCents: 29999 },
+        { memberId: "amara", amountCents: 30000 },
+        { memberId: "lucas", amountCents: 30000 },
+        { memberId: "elena", amountCents: 29999 },
       ],
     };
     const findings = checkMath(group);
@@ -98,34 +98,34 @@ describe("math integrity", () => {
 });
 
 describe("destination and policy", () => {
-  it("flags the Lagos lookalike and a new payout without failing the math", () => {
-    const policy = runPolicy(LAGOS_REVIEW);
+  it("flags the Lisbon lookalike and a new payout without failing the math", () => {
+    const policy = runPolicy(LISBON_REVIEW);
     expect(policy.verdict).toBe("WAIT");
     expect(policy.hardFailures).toHaveLength(0);
-    expect(policy.findings.some((finding) => finding.id.startsWith("dest-lookalike-amaka"))).toBe(true);
-    expect(policy.findings.some((finding) => finding.id === "dest-new-amaka")).toBe(true);
+    expect(policy.findings.some((finding) => finding.id.startsWith("dest-lookalike-maya"))).toBe(true);
+    expect(policy.findings.some((finding) => finding.id === "dest-new-maya")).toBe(true);
   });
 
   it("hard-rejects an invalid cashaddr and a mainnet address on chipnet", () => {
     const invalid = checkDestinations(
-      LAGOS_REVIEW.group,
+      LISBON_REVIEW.group,
       "chipnet",
-      LAGOS_REVIEW.receivers.map((receiver) =>
-        receiver.memberId === "amaka" ? { ...receiver, address: `${ADDRESSES.amaka}qq` } : receiver,
+      LISBON_REVIEW.receivers.map((receiver) =>
+        receiver.memberId === "maya" ? { ...receiver, address: `${ADDRESSES.maya}qq` } : receiver,
       ),
-      ["amaka"],
+      ["maya"],
     );
-    expect(invalid.some((finding) => finding.id === "dest-invalid-amaka" && finding.hard)).toBe(true);
+    expect(invalid.some((finding) => finding.id === "dest-invalid-maya" && finding.hard)).toBe(true);
 
     const wrongNetwork = checkDestinations(
-      LAGOS_REVIEW.group,
+      LISBON_REVIEW.group,
       "chipnet",
-      LAGOS_REVIEW.receivers.map((receiver) =>
-        receiver.memberId === "tunde" ? { ...receiver, address: ADDRESSES.amakaMainnet } : receiver,
+      LISBON_REVIEW.receivers.map((receiver) =>
+        receiver.memberId === "kenji" ? { ...receiver, address: ADDRESSES.mayaMainnet } : receiver,
       ),
-      ["amaka"],
+      ["maya"],
     );
-    expect(wrongNetwork.some((finding) => finding.id === "dest-network-tunde" && finding.hard)).toBe(true);
+    expect(wrongNetwork.some((finding) => finding.id === "dest-network-kenji" && finding.hard)).toBe(true);
   });
 });
 
@@ -157,15 +157,15 @@ describe("verdict combiner", () => {
   });
 
   it("lets a person override WAIT and refuses to override REJECT", () => {
-    const waited = reviewDemo(LAGOS_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
+    const waited = reviewDemo(LISBON_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
     expect(waited.finalVerdict).toBe("WAIT");
     expect(handoffAllowed(waited)).toBe(false);
     const overridden = applyHumanOverride(waited, {
-      name: "Amaka Osei",
-      reason: "Ife confirmed the hotel in person after the chat.",
+      name: "Maya Chen",
+      reason: "Daniel confirmed the hotel in person after the chat.",
       at: "2026-11-14T12:05:00.000Z",
     });
-    expect(overridden.humanOverride?.name).toBe("Amaka Osei");
+    expect(overridden.humanOverride?.name).toBe("Maya Chen");
     expect(handoffAllowed(overridden)).toBe(true);
     const leaked = reviewDemo(LEAK_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
     expect(() => applyHumanOverride(leaked, { name: "Ada", reason: "Ignore the cent and ship it.", at: "2026-11-14T12:06:00.000Z" })).toThrow(/WAIT/);
@@ -173,18 +173,19 @@ describe("verdict combiner", () => {
 });
 
 describe("recorded reviews", () => {
-  it("waits on the Lagos sample, settles the flat, and rejects the one-cent leak over SERV", () => {
-    const lagos = reviewDemo(LAGOS_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
-    expect(lagos.serv.mode).toBe("demo-recorded");
-    expect(lagos.serv.opinion.verdict).toBe("WAIT");
-    expect(lagos.policy.verdict).toBe("WAIT");
-    expect(lagos.finalVerdict).toBe("WAIT");
-    expect(lagos.disagreement).toBe(false);
-    expect(lagos.serv.opinion.fairness[0]).toMatchObject({ person: "Member 2", amountCents: 6000 });
-    expect(lagos.packet.notes).toContain(lagos.serv.opinion.disputes[0]!.quote);
-    expect(lagos.packet.notes).not.toMatch(/Amaka|Ife|Tunde|Seyi/);
-    expect(JSON.stringify(lagos.packet)).not.toContain("bchtest:");
-    expect(lagos.reasonTrail.at(-1)?.step).toBe("Second opinion");
+  it("waits on the Lisbon sample, settles the flat, and rejects the one-cent leak over SERV", () => {
+    const lisbon = reviewDemo(LISBON_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
+    expect(lisbon.serv.mode).toBe("demo-recorded");
+    expect(lisbon.serv.recordingId).toBe("lisbon-weekend");
+    expect(lisbon.serv.opinion.verdict).toBe("WAIT");
+    expect(lisbon.policy.verdict).toBe("WAIT");
+    expect(lisbon.finalVerdict).toBe("WAIT");
+    expect(lisbon.disagreement).toBe(false);
+    expect(lisbon.serv.opinion.fairness[0]).toMatchObject({ person: "Member 1", amountCents: 6000 });
+    expect(lisbon.packet.notes).toContain(lisbon.serv.opinion.disputes[0]!.quote);
+    expect(lisbon.packet.notes).not.toMatch(/Maya|Kenji|Sofia|Daniel/);
+    expect(JSON.stringify(lisbon.packet)).not.toContain("bchtest:");
+    expect(lisbon.reasonTrail.at(-1)?.step).toBe("Second opinion");
 
     const clean = reviewDemo(CLEAN_REVIEW, new Date("2026-11-14T12:00:00.000Z"));
     expect(clean.finalVerdict).toBe("SETTLE");
@@ -202,15 +203,15 @@ describe("recorded reviews", () => {
 
   it("replays the same inputs as the same verdict and shows what flips when the chat changes", () => {
     const now = new Date("2026-11-14T12:00:00.000Z");
-    const first = reviewDemo(LAGOS_REVIEW, now);
-    const replay = reviewDemo(LAGOS_REVIEW, now);
+    const first = reviewDemo(LISBON_REVIEW, now);
+    const replay = reviewDemo(LISBON_REVIEW, now);
     const same = diffAudits(first, replay);
     expect(same.hashChanged).toBe(false);
     expect(same.verdictHeld).toBe(true);
     expect(same.flipped).toHaveLength(0);
 
     const edited = reviewDemo(
-      { ...LAGOS_REVIEW, notes: "Amaka: Everyone agreed. Please settle.", receivers: LAGOS_REVIEW.group.members.map((member) => ({ memberId: member.id, address: member.address })) },
+      { ...LISBON_REVIEW, notes: "Maya: Everyone agreed. Please settle.", receivers: LISBON_REVIEW.group.members.map((member) => ({ memberId: member.id, address: member.address })) },
       now,
     );
     const diff = diffAudits(first, edited);
@@ -283,14 +284,14 @@ function walk(dir: string): string[] {
 
 describe("packet pseudonyms", () => {
   it("uses stable Member numbers and can include addresses when asked", () => {
-    const hidden = buildServPacket(LAGOS_REVIEW, []);
+    const hidden = buildServPacket(LISBON_REVIEW, []);
     expect(hidden.legend.map((item) => `${item.memberId}:${item.alias}`)).toEqual([
-      "amaka:Member 1",
-      "ife:Member 2",
-      "seyi:Member 3",
-      "tunde:Member 4",
+      "daniel:Member 1",
+      "kenji:Member 2",
+      "maya:Member 3",
+      "sofia:Member 4",
     ]);
-    const shown = buildServPacket({ ...LAGOS_REVIEW, includeAddresses: true }, []);
-    expect(shown.packet.people.find((person) => person.alias === "Member 1")?.payoutAddress).toBe(ADDRESSES.amakaLookalike);
+    const shown = buildServPacket({ ...LISBON_REVIEW, includeAddresses: true }, []);
+    expect(shown.packet.people.find((person) => person.alias === "Member 3")?.payoutAddress).toBe(ADDRESSES.mayaLookalike);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CLEAN_REVIEW, LAGOS_REVIEW, LEAK_REVIEW } from "./sample";
+import { CLEAN_REVIEW, LEAK_REVIEW, LISBON_REVIEW } from "./sample";
 import type { ServOpinion } from "./types";
 import { combineVerdicts } from "./verdict";
 import { buildAudit } from "../serv/review";
@@ -35,9 +35,9 @@ const meta = {
 };
 
 describe("unsupported hard-fact claims", () => {
-  it("does not let a false wrong-network REJECT raise Lagos above WAIT", () => {
+  it("does not let a false wrong-network REJECT raise the Lisbon weekend above WAIT", () => {
     const audit = buildAudit(
-      LAGOS_REVIEW,
+      LISBON_REVIEW,
       opinion({
         summary: "Reject. The payout is on the wrong network.",
         destinationNotes: [{ person: "Member 1", concern: "This is a mainnet address, not chipnet." }],

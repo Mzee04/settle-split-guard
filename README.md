@@ -108,7 +108,7 @@ npm test
 npm run dev
 ```
 
-The dev server listens on [http://127.0.0.1:3847](http://127.0.0.1:3847). Demo mode works with no key. Load **Lagos weekend**, **a clean flat**, or **the one-cent leak**, then press **Review before settling**.
+The dev server listens on [http://127.0.0.1:3847](http://127.0.0.1:3847). Demo mode works with no key. Load **Lisbon weekend**, **a clean flat**, or **the one-cent leak**, then press **Review before settling**.
 
 For a live verdict:
 
@@ -132,7 +132,7 @@ npm start
 
 | Sample | What you should see |
 | --- | --- |
-| Lagos weekend | **WAIT**. Ife is still on a $60 hotel share she denied. Tunde said he will pay later. Amaka’s payout shares a long prefix with her saved address. Both evaluators wait. Proceed stays off until a person records an override. |
+| Lisbon weekend | **WAIT**. Daniel is still on a $60 hotel share he denied. Kenji said he will pay later. Maya’s payout shares a long prefix with her saved address. Both evaluators wait. Proceed stays off until a person records an override. |
 | Clean flat | **SETTLE**. Rent and power, saved addresses, a short agreement in the notes. Proceed unlocks. |
 | One-cent leak | SERV’s recorded answer says **SETTLE** and misses the cent. The policy says **REJECT**. The final verdict is **REJECT**, the disagreement is on screen, and Proceed stays off. |
 

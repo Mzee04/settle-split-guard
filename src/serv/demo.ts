@@ -1,46 +1,46 @@
 import { inputsHash } from "../domain/hash";
-import { CLEAN_REVIEW, LAGOS_REVIEW, LEAK_REVIEW } from "../domain/sample";
+import { CLEAN_REVIEW, LEAK_REVIEW, LISBON_REVIEW } from "../domain/sample";
 import type { PolicyReport, ServOpinion, ServPacket } from "../domain/types";
 import { standInOpinion } from "./opinion";
 
-const LAGOS_OPINION: ServOpinion = {
+const LISBON_OPINION: ServOpinion = {
   verdict: "WAIT",
   confidencePercent: 74,
   summary:
-    "Wait. Member 2 is still on the hotel for $60.00 after saying they did not stay, and Member 4 said they will pay later. The local check also says Member 1's payout is new and looks like the address already saved for them. Nobody should sign until those three are fixed.",
+    "Wait. Member 1 is still on the hotel for $60.00 after saying they did not stay, and Member 2 said they will pay later. The local check also says Member 3's payout is new and looks like the address already saved for them. Nobody should sign until those three are fixed.",
   fairness: [
     {
-      person: "Member 2",
+      person: "Member 1",
       amountCents: 6000,
       reason:
-        "Member 2 is ticked on “Hotel, two nights” for an equal quarter, 6000 cents. The notes say they did not stay and ask to be taken off that line.",
+        "Member 1 is ticked on “Hotel, two nights” for an equal quarter, 6000 cents. The notes say they did not stay and ask to be taken off that line.",
     },
   ],
   disputes: [
     {
-      quote: "Member 2: I didn't stay at the hotel. I was at my cousin's in Yaba. Please take me off that one.",
-      person: "Member 2",
+      quote: "Member 1: I didn't stay at the hotel. I was at my cousin's in Alfama. Please take me off that one.",
+      person: "Member 1",
       unresolved: true,
       reason: "The hotel share is still on the ledger after this denial.",
     },
     {
-      quote: "Member 4: I'll pay my share later, after salary lands on Friday.",
-      person: "Member 4",
+      quote: "Member 2: I'll pay my share later, after salary lands on Friday.",
+      person: "Member 2",
       unresolved: true,
       reason: "A promise to pay later is not a signature on this settlement.",
     },
     {
-      quote: "Member 2: I'm not paying the hotel line until it is corrected.",
-      person: "Member 2",
+      quote: "Member 1: I'm not paying the hotel line until it is corrected.",
+      person: "Member 1",
       unresolved: true,
-      reason: "Member 2 is refusing the hotel line in the notes.",
+      reason: "Member 1 is refusing the hotel line in the notes.",
     },
   ],
   destinationNotes: [
     {
-      person: "Member 1",
+      person: "Member 3",
       concern:
-        "The local check says this payout is new to the group and shares a long prefix with the address saved on Member 1. Confirm it on another channel before any coins move.",
+        "The local check says this payout is new to the group and shares a long prefix with the address saved on Member 3. Confirm it on another channel before any coins move.",
     },
   ],
   reasonTrail: [
@@ -50,11 +50,11 @@ const LAGOS_OPINION: ServOpinion = {
     },
     {
       step: "Fairness",
-      because: "Member 2's 6000 cent hotel share contradicts the note that they did not stay. Dinner already excludes them, so the hotel line is the odd one.",
+      because: "Member 1's 6000 cent hotel share contradicts the note that they did not stay. Dinner already excludes them, so the hotel line is the odd one.",
     },
     {
       step: "Destination",
-      because: "Member 1 would be paid at an address the local check calls new and lookalike. Addresses were not copied into this request, so the concern is the local finding, not a guess at the string.",
+      because: "Member 3 would be paid at an address the local check calls new and lookalike. Addresses were not copied into this request, so the concern is the local finding, not a guess at the string.",
     },
     {
       step: "Disputes",
@@ -62,7 +62,7 @@ const LAGOS_OPINION: ServOpinion = {
     },
     {
       step: "Recommendation",
-      because: "WAIT. Fix the hotel tick, replace the payout with the saved address, and get Member 4 to settle in this transaction or drop their line. Then review again.",
+      because: "WAIT. Fix the hotel tick, replace the payout with the saved address, and get Member 2 to settle in this transaction or drop their line. Then review again.",
     },
   ],
 };
@@ -101,7 +101,7 @@ const LEAK_OPINION: ServOpinion = {
 };
 
 const RECORDINGS: { id: string; hash: string; opinion: ServOpinion }[] = [
-  { id: "lagos-weekend", hash: inputsHash(LAGOS_REVIEW), opinion: LAGOS_OPINION },
+  { id: "lisbon-weekend", hash: inputsHash(LISBON_REVIEW), opinion: LISBON_OPINION },
   { id: "flat-4b", hash: inputsHash(CLEAN_REVIEW), opinion: CLEAN_OPINION },
   { id: "flat-4b-leak", hash: inputsHash(LEAK_REVIEW), opinion: LEAK_OPINION },
 ];

@@ -48,15 +48,15 @@ Settle Split Guard is new work for this hackathon. The review gate, the SERV cal
 
 0:00 — Open the app. Say: this does not sign. It reviews a Settlemany group before the signatures.
 
-0:15 — Click **Load Lagos weekend**. Point at the hotel ($240, four ways), the taxi, and dinner, which already leaves Ife off. Point at Amaka’s payout: it is not the address saved on her profile, and it shares a long prefix with that address. The notes are on screen: “I didn’t stay” and “I’ll pay later.”
+0:15 — Click **Load Lisbon weekend**. Point at the hotel ($240, four ways), the taxi, and dinner, which already leaves Daniel off. Point at Maya’s payout: it is not the address saved on her profile, and it shares a long prefix with that address. The notes are on screen: “I didn’t stay” and “I’ll pay later.”
 
 0:35 — Open **Payload SERV would see**. Names are Member 1… Member 4. Addresses are absent unless the box is checked. Say the key never leaves the server, and demo mode is labelled because no live call is required for this pass.
 
-0:50 — Click **Review before settling**. The card is **WAIT**. Show fairness: Ife, $60, the hotel. Show the dispute quotes. Show the lookalike under destination. Both evaluators say WAIT. Proceed is disabled.
+0:50 — Click **Review before settling**. The card is **WAIT**. Show fairness: Daniel, $60, the hotel. Show the dispute quotes. Show the lookalike under destination. Both evaluators say WAIT. Proceed is disabled.
 
 1:10 — Scroll the reason trail and the audit JSON. Click **Replay this audit’s inputs**. The hash matches and the verdict holds.
 
-1:25 — Delete the dispute lines and set Amaka’s payout back to her saved address. Review again. The hash changes and the screen lists what flipped. If demo mode is still on and the inputs are no longer the recording, the banner says this reasoning is a stand-in, not a model.
+1:25 — Delete the dispute lines and set Maya’s payout back to her saved address. Review again. The hash changes and the screen lists what flipped. If demo mode is still on and the inputs are no longer the recording, the banner says this reasoning is a stand-in, not a model.
 
 1:40 — Click **Load the one-cent leak**. Review. SERV’s recorded answer says SETTLE. The policy says REJECT. The banner says they disagree, the final verdict is REJECT, and Proceed stays off. Say: a model cannot overrule a failed hard rule.
 

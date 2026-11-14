@@ -4,37 +4,38 @@ import type { Transfer } from "./netting";
 import type { ReviewInput } from "./types";
 
 export const ADDRESSES = {
-  amaka: "bchtest:qqz90hkvl4tcwmwq8sszsqtjlh68km8g5czt2l63nw",
-  amakaLookalike: "bchtest:qqz90hkvl4tcwmwq8sszsqtjlh68km8gtyl7mc9aex",
-  tunde: "bchtest:qzwc74jnxpfxac9dt4k523d0r88vvzxp2u90j5rmr3",
-  seyi: "bchtest:qzym9cp5wd3dcyxklwhjhjmpk8a55sm08vku73lsla",
-  ife: "bchtest:qrcdvh5v5eqy9krf5xnq4ftvx75p36lp6cr60fpc4a",
-  ada: "bchtest:qpvxjckrw6hre7wgnxwtspg58uvpasswny3a49276v",
-  bola: "bchtest:qpu2j3vgc0eq2hd0vexx2wjuj0c6edmgf53965yu52",
-  chi: "bchtest:qr8wljz5695d8609wue3cvdvs78deypk6gqwe33pgh",
-  amakaMainnet: "bitcoincash:qqz90hkvl4tcwmwq8sszsqtjlh68km8g5cxewccx5j",
+  maya: "bchtest:qq88n2a6ets206699j8xgcz4sskn7j0tmvx4fg226d",
+  mayaLookalike: "bchtest:qq88n2a6ets206699j8xgcz4sskn7j0tysmqc04xs9",
+  kenji: "bchtest:qrnd7u6x207suwdpd3yrhw5qf3ejvhfs75neml50g4",
+  sofia: "bchtest:qrjhnfr4dglqhk8jjcvxxk5hyhd82t7ass08jz3ysm",
+  daniel: "bchtest:qp27mzfmye6mneg95cvk76pvzxrajwl8pvlwcmepjl",
+  amara: "bchtest:qquwdlg7azvd9vd8jakzjknvjyxddrgaasajmv9zy9",
+  lucas: "bchtest:qpuuwvcqtvezu59wjy2r3kk0qgl8t58l9vvj8dmax5",
+  elena: "bchtest:qpzdut9f9d7spq3eqgjqduyw9avpuqt28cwpy3qlvh",
+  mayaMainnet: "bitcoincash:qq88n2a6ets206699j8xgcz4sskn7j0tmvz8d0gaa3",
 } as const;
 
 const WHEN = "2026-11-13T18:00:00.000Z";
 
-function lagosGroup(): Group {
+function lisbonGroup(): Group {
   const members = [
-    { id: "amaka", name: "Amaka Osei", address: ADDRESSES.amaka },
-    { id: "tunde", name: "Tunde Bakare", address: ADDRESSES.tunde },
-    { id: "seyi", name: "Seyi Adeniran", address: ADDRESSES.seyi },
-    { id: "ife", name: "Ife Okoye", address: ADDRESSES.ife },
+    { id: "maya", name: "Maya Chen", address: ADDRESSES.maya },
+    { id: "kenji", name: "Kenji Sato", address: ADDRESSES.kenji },
+    { id: "sofia", name: "Sofia Alves", address: ADDRESSES.sofia },
+    { id: "daniel", name: "Daniel Berg", address: ADDRESSES.daniel },
   ];
   return {
-    id: "lagos-weekend",
-    name: "Lagos weekend",
-    story: "Four friends, one hotel, a taxi from the airport, and dinner. Ife says she never stayed. Amaka's payout address is one character-run away from the address saved on her profile.",
+    id: "lisbon-weekend",
+    name: "Lisbon weekend",
+    story:
+      "Four friends, one hotel, a taxi from the airport, and dinner. Daniel says he never stayed. Maya's payout address is one character-run away from the address saved on her profile.",
     createdAt: WHEN,
     members,
     expenses: [
       {
         id: "hotel",
         memo: "Hotel, two nights",
-        payerId: "amaka",
+        payerId: "maya",
         amountCents: 24000,
         currency: "USD",
         usdCents: 24000,
@@ -46,7 +47,7 @@ function lagosGroup(): Group {
       {
         id: "taxi",
         memo: "Airport taxi",
-        payerId: "seyi",
+        payerId: "sofia",
         amountCents: 3250,
         currency: "USD",
         usdCents: 3250,
@@ -58,17 +59,17 @@ function lagosGroup(): Group {
       {
         id: "food",
         memo: "Dinner at the grill",
-        payerId: "tunde",
+        payerId: "kenji",
         amountCents: 9600,
         currency: "USD",
         usdCents: 9600,
         fxNote: "Entered in USD",
         splitMode: "shares",
         parts: [
-          { memberId: "amaka", shares: 2 },
-          { memberId: "tunde", shares: 2 },
-          { memberId: "seyi", shares: 1 },
-          { memberId: "ife", shares: 0 },
+          { memberId: "maya", shares: 2 },
+          { memberId: "kenji", shares: 2 },
+          { memberId: "sofia", shares: 1 },
+          { memberId: "daniel", shares: 0 },
         ],
         createdAt: WHEN,
       },
@@ -77,32 +78,32 @@ function lagosGroup(): Group {
   };
 }
 
-const LAGOS_NOTES = `Amaka: The hotel was $240 for two nights. I put it on my card.
-Ife: I didn't stay at the hotel. I was at my cousin's in Yaba. Please take me off that one.
-Tunde: I paid for the grill. Ife didn't eat, so I left her off that bill.
-Seyi: The airport taxi was $32.50 from my cash.
-Tunde: I'll pay my share later, after salary lands on Friday.
-Ife: I'm not paying the hotel line until it is corrected.`;
+const LISBON_NOTES = `Maya: The hotel was $240 for two nights. I put it on my card.
+Daniel: I didn't stay at the hotel. I was at my cousin's in Alfama. Please take me off that one.
+Kenji: I paid for the grill. Daniel didn't eat, so I left him off that bill.
+Sofia: The airport taxi was $32.50 from my cash.
+Kenji: I'll pay my share later, after salary lands on Friday.
+Daniel: I'm not paying the hotel line until it is corrected.`;
 
-export const LAGOS_REVIEW: ReviewInput = {
+export const LISBON_REVIEW: ReviewInput = {
   network: "chipnet",
-  group: lagosGroup(),
+  group: lisbonGroup(),
   receivers: [
-    { memberId: "amaka", address: ADDRESSES.amakaLookalike },
-    { memberId: "tunde", address: ADDRESSES.tunde },
-    { memberId: "seyi", address: ADDRESSES.seyi },
-    { memberId: "ife", address: ADDRESSES.ife },
+    { memberId: "maya", address: ADDRESSES.mayaLookalike },
+    { memberId: "kenji", address: ADDRESSES.kenji },
+    { memberId: "sofia", address: ADDRESSES.sofia },
+    { memberId: "daniel", address: ADDRESSES.daniel },
   ],
-  notes: LAGOS_NOTES,
+  notes: LISBON_NOTES,
   pseudonymize: true,
   includeAddresses: false,
 };
 
 function flatGroup(id: string, name: string, story: string): Group {
   const members = [
-    { id: "ada", name: "Adaeze Cole", address: ADDRESSES.ada },
-    { id: "bola", name: "Bola Martins", address: ADDRESSES.bola },
-    { id: "chi", name: "Chi Nwankwo", address: ADDRESSES.chi },
+    { id: "amara", name: "Amara Diallo", address: ADDRESSES.amara },
+    { id: "lucas", name: "Lucas Ferreira", address: ADDRESSES.lucas },
+    { id: "elena", name: "Elena Costa", address: ADDRESSES.elena },
   ];
   return {
     id,
@@ -114,7 +115,7 @@ function flatGroup(id: string, name: string, story: string): Group {
       {
         id: "rent",
         memo: "March rent",
-        payerId: "ada",
+        payerId: "amara",
         amountCents: 90000,
         currency: "USD",
         usdCents: 90000,
@@ -126,7 +127,7 @@ function flatGroup(id: string, name: string, story: string): Group {
       {
         id: "power",
         memo: "Power bill",
-        payerId: "bola",
+        payerId: "lucas",
         amountCents: 4500,
         currency: "USD",
         usdCents: 4500,
@@ -140,17 +141,21 @@ function flatGroup(id: string, name: string, story: string): Group {
   };
 }
 
-const FLAT_NOTES = `Adaeze: Rent and power look right.
-Bola: Agreed.
-Chi: Please settle tonight.`;
+const FLAT_NOTES = `Amara: Rent and power look right.
+Lucas: Agreed.
+Elena: Please settle tonight.`;
 
 export const CLEAN_REVIEW: ReviewInput = {
   network: "chipnet",
-  group: flatGroup("flat-4b", "Flat 4B, March", "Rent and power for three roommates. Everyone already agreed in the chat, and each payout address is the one saved on that person."),
+  group: flatGroup(
+    "flat-4b",
+    "Flat 4B, March",
+    "Rent and power for three roommates. Everyone already agreed in the chat, and each payout address is the one saved on that person.",
+  ),
   receivers: [
-    { memberId: "ada", address: ADDRESSES.ada },
-    { memberId: "bola", address: ADDRESSES.bola },
-    { memberId: "chi", address: ADDRESSES.chi },
+    { memberId: "amara", address: ADDRESSES.amara },
+    { memberId: "lucas", address: ADDRESSES.lucas },
+    { memberId: "elena", address: ADDRESSES.elena },
   ],
   notes: FLAT_NOTES,
   pseudonymize: true,
@@ -175,9 +180,9 @@ export const LEAK_REVIEW: ReviewInput = {
   network: "chipnet",
   group: leakGroup,
   receivers: [
-    { memberId: "ada", address: ADDRESSES.ada },
-    { memberId: "bola", address: ADDRESSES.bola },
-    { memberId: "chi", address: ADDRESSES.chi },
+    { memberId: "amara", address: ADDRESSES.amara },
+    { memberId: "lucas", address: ADDRESSES.lucas },
+    { memberId: "elena", address: ADDRESSES.elena },
   ],
   notes: FLAT_NOTES,
   pseudonymize: true,
